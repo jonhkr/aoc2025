@@ -1,7 +1,7 @@
 import re
 
 def joltage_loop(bats, n):
-	result = ''
+	result = 0
 	last_index = -1
 	for i in range(0, n):
 		selected = 0
@@ -12,13 +12,12 @@ def joltage_loop(bats, n):
 			if v > selected:
 				selected = v
 				last_index = j
-		result += str(selected)
+		result = result * 10 + selected
 
 	return result
 
 
 def joltage_recursive(bats, n):
-	bat_d = '0'
 	bat_v = 0
 	bat_i = 0
 	for i, d in enumerate(bats):
@@ -31,12 +30,12 @@ def joltage_recursive(bats, n):
 
 		if i + n == len(bats):
 			if n == 1:
-				return bat_d
+				return bat_v
 			else:
-				return bat_d + joltage_recursive(bats[bat_i+1:], n-1)
+				return bat_v * (10 ** n) + joltage_recursive(bats[bat_i+1:], n-1)
 
 
-with open('input.txt', 'r') as file:
+with open('sample-input.txt', 'r') as file:
 	part_1 = 0
 	part_2 = 0
 	for line in file:
@@ -48,8 +47,8 @@ with open('input.txt', 'r') as file:
 		# jolt_2 = joltage_recursive(line, 2)
 		# jolt_12 = joltage_recursive(line, 12)
 		
-		part_1 += int(jolt_2)
-		part_2 += int(jolt_12)
+		part_1 += jolt_2
+		part_2 += jolt_12
 	
 	print("Part 1:", part_1)
 	print("Part 2:", part_2)		
