@@ -14,14 +14,17 @@ def find_reachable(board):
 				continue
 
 			neighbors = 0
-			for k in range(0, len(Y_MASK)):
+			for k in range(len(Y_MASK)):
 				ny = Y_MASK[k]
 				nx = X_MASK[k]
 				i = y + ny
 				j = x + nx
-				if -1 < i < y_size and -1 < j < x_size:
-					if board[i][j] == PAPER_ROLL:
-						neighbors += 1
+
+				if -1 < i < y_size and -1 < j < x_size and board[i][j] == PAPER_ROLL:
+					neighbors += 1
+
+				if neighbors > 3:
+					break
 
 			if neighbors < 4:
 				reachable.append((x, y))
@@ -43,5 +46,5 @@ with open('input.txt', 'r') as file:
 			board[y][x] = EMPTY
 			removed += 1
 
-	print("Part 2", removed)
+	print("Part 2:", removed)
 
