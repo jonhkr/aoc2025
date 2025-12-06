@@ -1,6 +1,6 @@
 
 void main() throws IOException {
-    final var lines = Files.readAllLines(Path.of("./input.txt")).stream().toList();
+    final var lines = Files.readAllLines(Path.of("./sample-input.txt")).stream().toList();
     final var opsLine = lines.getLast() + ' ';
     final var ops = Arrays.stream(opsLine.split(" +")).toList();
     final var digitLines = lines.subList(0, lines.size() -1);
@@ -42,6 +42,36 @@ void main() throws IOException {
 
     System.out.println("Part 1: " + part1);
     System.out.println("Part 2: " + part2);
+    System.out.println("Part 2: " + part2Alternative(lines));
+}
+
+private long part2Alternative(List<String> lines) {
+    var width = lines.getLast().length();
+    var stack = new Stack<Long>();
+    var part2 = 0L;
+    for (int w = width-1; w >= 0; w--) {
+        int finalW = w;
+        var data = lines.stream()
+                .map(l -> l.charAt(finalW))
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+
+        if (data.trim().isEmpty()) {
+            continue;
+        }
+
+        if (data.matches(".*[*+]$")) {
+            var op = data.charAt(data.length()-1);
+            var lastNum = Long.parseLong(data.substring(0, data.length()-1).trim());
+            stack.push(lastNum);
+            part2 += applyOp(op, stack.stream().mapToLong(Long::longValue));
+            stack.clear();
+        } else {
+            stack.push(Long.parseLong(data.trim()));
+        }
+    }
+
+    return part2;
 }
 
 private long applyOp(String op, LongStream values) {
@@ -50,4 +80,8 @@ private long applyOp(String op, LongStream values) {
         case "*" -> values.reduce(1L, (left, right) -> left * right);
         default -> throw new IllegalArgumentException("Invalid op: " + op);
     };
+}
+
+private long applyOp(char op, LongStream values) {
+    return applyOp(String.valueOf(op), values);
 }
