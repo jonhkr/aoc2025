@@ -14,8 +14,8 @@ void main() throws IOException {
             if (l.charAt(x) == '^') {
                 splits.getAndIncrement();
                 final var beans = beanMap.get(x);
-                beanMap.compute(x - 1, (_, v) -> v == null ? beans : v + beans);
-                beanMap.compute(x + 1, (_, v) -> v == null ? beans : v + beans);
+                beanMap.merge(x - 1, beans, Long::sum);
+                beanMap.merge(x + 1, beans, Long::sum);
                 beanMap.remove(x);
             }
         });
