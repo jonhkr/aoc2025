@@ -5,9 +5,8 @@ void main() throws IOException {
 
     final var splits = new AtomicInteger();
 
-    final var beanMap = new HashMap<Integer, Long>() {{
-        put(lines.getFirst().indexOf('S'), 1L);
-    }};
+    final var beanMap = new HashMap<Integer, Long>();
+    beanMap.put(lines.getFirst().indexOf('S'), 1L);
 
     lines.stream().skip(1).forEach(l -> {
         new ArrayList<>(beanMap.keySet()).forEach(x -> {
