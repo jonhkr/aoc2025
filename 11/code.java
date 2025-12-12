@@ -14,17 +14,17 @@ void main() {
             })
             .collect(Collectors.toMap(Device::name, Device::devices));
 
-    print("Part 1:", part1(deviceMap, "you", new HashMap<>()));
+    print("Part 1:", count(deviceMap, "you", "out", new HashMap<>()));
     print("Part 2:", (
-              part2(deviceMap, "svr", "dac", new HashMap<>())
-            * part2(deviceMap, "dac", "fft", new HashMap<>())
-            * part2(deviceMap, "fft", "out", new HashMap<>()) + (
-              part2(deviceMap, "svr", "fft", new HashMap<>())
-            * part2(deviceMap, "fft", "dac", new HashMap<>())
-            * part2(deviceMap, "dac", "out", new HashMap<>()))));
+              count(deviceMap, "svr", "dac", new HashMap<>())
+            * count(deviceMap, "dac", "fft", new HashMap<>())
+            * count(deviceMap, "fft", "out", new HashMap<>()) + (
+              count(deviceMap, "svr", "fft", new HashMap<>())
+            * count(deviceMap, "fft", "dac", new HashMap<>())
+            * count(deviceMap, "dac", "out", new HashMap<>()))));
 }
 
-long part2(Map<String, List<String>> devices, String from, String to, Map<String, Long> visited) {
+long count(Map<String, List<String>> devices, String from, String to, Map<String, Long> visited) {
     if (from.equals(to)) {
         return 1L;
     }
@@ -40,29 +40,10 @@ long part2(Map<String, List<String>> devices, String from, String to, Map<String
     }
     var total = 0L;
     for (var option : options) {
-        total += part2(devices, option, to, visited);
+        total += count(devices, option, to, visited);
     }
 
     visited.put(from, total);
-    return total;
-}
-
-long part1(Map<String, List<String>> devices, String name, Map<String, Long> visited) {
-    if (visited.containsKey(name)) {
-        return visited.get(name);
-    }
-
-    var options = devices.get(name);
-    if (options.contains("out")) {
-        return 1;
-    }
-    var total = 0L;
-    for (var option : options) {
-        var n = part1(devices, option, visited);
-        visited.put(option, n);
-        total += n;
-    }
-
     return total;
 }
 
