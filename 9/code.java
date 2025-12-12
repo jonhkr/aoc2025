@@ -64,9 +64,9 @@ record SortedPair<T extends Comparable<T>>(T a, T b) {
     }
 }
 
-void main() throws IOException {
-    final var points = Files.readAllLines(Path.of("./input.txt"))
-            .stream()
+void main() {
+    var input = new BufferedReader(new InputStreamReader(System.in));
+    final var points = input.lines()
             .map(line -> new Point(Arrays
                     .stream(line.split(","))
                     .map(Integer::parseInt)
