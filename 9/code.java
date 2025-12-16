@@ -103,8 +103,7 @@ void main() {
 }
 
 /**
- * Builds a prefix sum array to be used to check if a rectangle is
- * inside the polygon.
+ * Builds a prefix sum array to check if a rectangle is inside the polygon.
  * The resulting array is of size(x+1, y+1)
  * eg:
  * input:
@@ -131,10 +130,10 @@ private long[][] buildPrefixSumArray(byte[][] baseGrid) {
 
 /**
  * Checks if the rectangle formed by the two points p and q is valid
- * by firstly compressing the coordinates and looking if the area of the
- * is filled with 1s.
+ * by firstly compressing the coordinates and then looking if the
+ * area is filled with 1s.
  * The algorithm uses a prefix sum array to check how many 1s
- * there are in the area of the rectangle.
+ * are in the area of the rectangle.
  */
 private boolean valid(long[][] psa, Point p, Point q, List<Integer> xs, List<Integer> ys) {
     var cxs = new SortedPair<>(xs.indexOf(p.x) * 2, xs.indexOf(q.x) * 2);
@@ -192,7 +191,7 @@ private void floodFillInPlace(byte[][] grid) {
 }
 
 /**
- * build a compressed array using the indexes of xs and ys
+ * builds a compressed array using the indexes of xs and ys
  * a gap is added to every span to keep the overall shape of the original matrix
  * eg
  *  [x1,  gap   , x2]
