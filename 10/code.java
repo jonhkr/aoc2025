@@ -4,71 +4,44 @@ import java.util.regex.Pattern;
 
 record Button(Set<Integer> lights, int bits) {}
 record Machine(int lightBits, List<Button> buttons, List<Integer> joltage) {}
-
-Set<Set<Button>> combinations(List<Button> buttons, int count) {
-    var list = new ArrayList<>(buttons);
-    var result = new HashSet<Set<Button>>();
-    backtrack(list, count, 0, new LinkedHashSet<>(), result);
-    return result;
-}
-
-private void backtrack(List<Button> buttons, int count,
-                       int index, LinkedHashSet<Button> current,
-                       HashSet<Set<Button>> result) {
-
-    if (current.size() == count) {
-        result.add(Set.copyOf(current));
-        return;
-    }
-
-    if (index == buttons.size()) return;
-
-    current.add(buttons.get(index));
-    backtrack(buttons, count, index + 1, current, result);
-
-    current.remove(buttons.get(index));
-    backtrack(buttons, count, index + 1, current, result);
-}
-
-void testCombinations() {
-    var r = List.of(new Button(Set.of(1, 2),0), new Button(Set.of(0,3),0), new Button(Set.of(3),0));
-    var c = combinations(r, 2);
-    if (!Set.of(
-            Set.of(new Button(Set.of(1, 2),0), new Button(Set.of(0, 3),0)),
-            Set.of(new Button(Set.of(1, 2),0), new Button(Set.of(3),0)),
-            Set.of(new Button(Set.of(0, 3),0), new Button(Set.of(3),0))
-    ).equals(c)) {
-        throw new AssertionError();
-    }
-}
+record Tuple<A, B>(A a, B b) {}
 
 void main() {
-    testCombinations();
-
     var in = new BufferedReader(new InputStreamReader(System.in));
     var machines = parseInput(in);
     var part1 = 0L;
     var part2 = 0L;
     for (var m : machines) {
-        done:
-        for (var c : IntStream.range(1, m.buttons().size() + 1).toArray()) {
-            for (var attempt : combinations(m.buttons(), c)) {
-                var lightBits = 0L;
-                for(var button : attempt) {
-                    lightBits ^= button.bits;
-                }
-                if (m.lightBits == lightBits) {
-                    part1 += c;
-                    break done;
-                }
-            }
-        }
 
+        part1 += configureLights(m);
         part2 += solveWithLA(m);
     }
 
     print("Part 1:", part1);
     print("Part 2:", part2);
+}
+
+private int configureLights(Machine m) {
+    var result = new ArrayDeque<Tuple<Integer, Integer>>();
+    result.push(new Tuple<>(0, 0));
+
+    var seen = new HashSet<Integer>();
+    seen.add(0);
+
+    for (var r = result.poll(); r != null; r = result.poll()) {
+        if (r.a == m.lightBits) {
+            return r.b;
+        }
+
+        for (var button : m.buttons) {
+            var lights = r.a ^ button.bits;
+            if (seen.add(lights)) {
+                result.add(new Tuple<>(lights, r.b + 1));
+            }
+        }
+    }
+
+    throw new AssertionError("Could not solve");
 }
 
 private double[][] buildAugmentedMatrix(Machine m) {
@@ -263,7 +236,7 @@ List<Machine> parseInput(BufferedReader in) {
                 }
                 var lights = matcher.group(1);
                 var lightBits = IntStream.range(0, lights.length())
-                        .map(i -> lights.charAt(i) == '#' ? Math.powExact(2, i) : 0).sum();
+                        .map(i -> lights.charAt(i) == '#' ? 1 << i : 0).sum();
 
                 var buttons = matcher.group(2);
                 var b = Arrays.stream(buttons.split(" "))
@@ -272,7 +245,7 @@ List<Machine> parseInput(BufferedReader in) {
                                             .split(","))
                                     .mapToInt(Integer::parseInt)
                                     .boxed().collect(Collectors.toSet());
-                            var bits = ints.stream().mapToInt(i -> Math.powExact(2, i)).sum();
+                            var bits = ints.stream().mapToInt(i -> 1 << i).sum();
                             return new Button(ints, bits);
                         }).toList();
                 var j = Arrays.stream(matcher.group(3).split(",")).mapToInt(Integer::parseInt)
